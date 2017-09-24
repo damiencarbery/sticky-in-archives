@@ -2,9 +2,8 @@
 /*
 Plugin Name: Sticky in Archives
 Plugin URI: http://www.damiencarbery.com/2017/09/sticky-posts-in-category-archives/
-GitHub Plugin URI: https://github.com/damiencarbery/sticky-in-archives/
 Description: Move sticky posts to top of archive listings.
-Version: 0.1
+Version: 0.2
 Author: Damien Carbery
 Author URI: http://www.damiencarbery.com/
 */
@@ -43,12 +42,15 @@ class StickyInCategory {
 
 		// Filter retrieved posts
 		add_filter(	'the_posts', array( $this, 'prepend_sticky_posts' ), 10, 2 );
+		
+		// Set the 'sticky' class
+		add_filter( 'post_class', array( $this, 'set_sticky_post_class' ), 10, 3 );
         
 	}
 
 
 	/**
-	 * Move sticky posts to the top of the 
+	 * Move sticky posts to the top of the archive listing.
 	 */
 	public function prepend_sticky_posts( $posts, $query ) {
 
@@ -96,6 +98,21 @@ class StickyInCategory {
 		}
 		return $posts;
 	}
+	
+	
+	/**
+	 * Set the 'sticky' post class. get_post_class() only does it on the home page.
+	 */
+	public function set_sticky_post_class( $classes, $class, $post_ID ) {
+		
+		// TODO: Consider whether to reference $this->categories.
+		if ( is_archive() && is_sticky( $post_ID ) ) {
+			$classes[] = 'sticky';
+		}
+		return $classes;
+	}
+
+	
 } 
 
 add_action( 'plugins_loaded', array( 'StickyInCategory', 'get_instance' ) );
